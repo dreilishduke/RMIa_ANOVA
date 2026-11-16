@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Walks: one-way ANOVA</title>
+<meta name="description" content="RMIa Lecture 7 activity: walk through a published one-way ANOVA (Trammell et al., 2024).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1E2A2E; --head:#2C4A52; --a1:#46717E; --a2:#2F5D50; --a3:#3B7368; --grey:#55636A;
+  --mint:#CFE3DA; --pale:#EEF4F1; --bg:#FFFFFF; --line:#C9D6D0;
+  --nat:#2F5D50; --urb:#46717E; --ind:#8A6A3B;
+  --ok:#2F5D50; --okbg:#DDEFE5; --no:#8A3B2E; --nobg:#F6E3DF;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Inter,"Segoe UI",Aptos,system-ui,sans-serif}
+header{background:var(--head);color:#fff;padding:28px 16px 24px}
+header .wrap,main{max-width:760px;margin:0 auto}
+header h1{margin:6px 0 6px;font-size:1.7rem;line-height:1.2}
+header p{margin:0;opacity:.92}
+.pill{display:inline-block;background:var(--a1);color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:.85rem}
+main{padding:12px 16px 48px}
+nav.steps{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+nav.steps a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--pale);color:var(--head);font-weight:700;text-decoration:none;border:2px solid var(--line)}
+nav.steps a.done{background:var(--a2);color:#fff;border-color:var(--a2)}
+section.step{border:1px solid var(--line);border-radius:14px;padding:18px 16px;margin:18px 0;background:#fff}
+section.step>h2{margin:0 0 4px;font-size:1.3rem;color:var(--head);display:flex;gap:10px;align-items:center}
+.num{flex:none;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--a2);color:#fff;font-size:1rem}
+.lead{color:var(--grey);margin:0 0 12px}
+.q{background:var(--pale);border-radius:10px;padding:12px;margin:12px 0}
+.q>p{margin:0 0 8px;font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+button.opt{font:inherit;border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left;min-height:44px}
+button.opt:hover{border-color:var(--a1)}
+button.opt.right{background:var(--okbg);border-color:var(--ok)}
+button.opt.wrong{background:var(--nobg);border-color:var(--no)}
+.fb{margin-top:8px;font-size:.95rem;min-height:0}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--no)}
+.fb:empty{display:none}
+.card{background:var(--mint);border-radius:10px;padding:12px;margin:12px 0}
+.study{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.study div{border-radius:10px;padding:10px;color:#fff;font-weight:700;text-align:center}
+.study small{display:block;font-weight:400;opacity:.95}
+label.sl{display:block;margin:12px 0 2px;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--a2);height:32px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.stats div{background:var(--pale);border-radius:10px;padding:8px;text-align:center}
+.stats b{display:block;font-size:1.25rem;color:var(--head)}
+.stats span{font-size:.85rem;color:var(--grey)}
+.verdict{border-radius:10px;padding:10px 12px;font-weight:600}
+.verdict.sig{background:var(--okbg);color:var(--ok)} .verdict.ns{background:var(--nobg);color:var(--no)}
+svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:6px 0;font-weight:700;font-size:.95rem}
+.chal{list-style:none;padding:0;margin:8px 0}
+.chal li{padding:8px 10px;border-radius:8px;background:var(--pale);margin:6px 0}
+.chal li.met{background:var(--okbg)}
+.chal li.met::before{content:"✓ ";color:var(--ok);font-weight:700}
+.apa{font-size:1.5rem;text-align:center;margin:8px 0 12px;color:var(--head)}
+.match{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center}
+.match select{width:100%}
+.match .tok{font-weight:700;color:var(--head);background:var(--mint);border-radius:8px;padding:6px 10px;text-align:center}
+select{font:inherit;border:2px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;color:var(--ink);max-width:100%;min-height:44px}
+select.right{border-color:var(--ok);background:var(--okbg)} select.wrong{border-color:var(--no);background:var(--nobg)}
+.sentence{line-height:2.4}
+.sentence select{font-size:.95rem;padding:2px 4px;min-height:36px}
+button.go{font:inherit;font-weight:700;background:var(--a2);color:#fff;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;margin-top:10px;min-height:44px}
+button.go.alt{background:var(--a1)}
+.bars{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:end;height:160px;margin:10px 0 4px}
+.bars div{border-radius:8px 8px 0 0;color:#fff;font-weight:700;text-align:center;padding-top:6px}
+.barlab{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;font-size:.9rem;color:var(--grey)}
+footer{max-width:760px;margin:0 auto;padding:0 16px 40px;color:var(--grey);font-size:.9rem}
+@media (max-width:520px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  header h1{font-size:1.45rem}
+  .apa{font-size:1.2rem}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <span class="pill">RMIa · Lecture 7</span>
+  <h1>Does where you walk change how you feel?</h1>
+  <p>Read a published one-way ANOVA, step by step. Nothing you enter is collected or saved.</p>
+</div></header>
+
+<main>
+<nav class="steps" aria-label="Steps">
+  <a href="#s1" id="n1">1</a><a href="#s2" id="n2">2</a><a href="#s3" id="n3">3</a><a href="#s4" id="n4">4</a>
+  <a href="#s5" id="n5">5</a><a href="#s6" id="n6">6</a><a href="#s7" id="n7">7</a><a href="#s8" id="n8">8</a>
+</nav>
+
+<div class="card">
+  <strong>The study.</strong> Trammell, Harriger &amp; Krumrei-Mancuso (2024) randomly assigned 188 undergraduates to one 20-minute walk: a nature trail, a busy four-lane road, or a treadmill in a bare lab room. Afterwards, everyone rated how <em>restorative</em> the walk felt (higher = more restorative) and did some memory and attention tasks.
+</div>
+<div class="study" aria-hidden="true">
+  <div style="background:var(--nat)">Nature trail<small>n = 63</small></div>
+  <div style="background:var(--urb)">Busy road<small>n = 66</small></div>
+  <div style="background:var(--ind)">Treadmill<small>n = 59</small></div>
+</div>
+
+<!-- STEP 1 -->
+<section class="step" id="s1">
+  <h2><span class="num">1</span>Work out the design</h2>
+  <p class="lead">Tap an answer. You'll get feedback straight away.</p>
+  <div id="q1"></div>
+</section>
+
+<!-- STEP 2 -->
+<section class="step" id="s2">
+  <h2><span class="num">2</span>The hypotheses</h2>
+  <p class="lead"><strong>RQ:</strong> Does walking environment affect perceived restoration?</p>
+  <div id="q2"></div>
+</section>
+
+<!-- STEP 3 -->
+<section class="step" id="s3">
+  <h2><span class="num">3</span>Why not just run lots of t-tests?</h2>
+  <p class="lead">Each test at .05 has a 5% chance of a false alarm (Type I error). Move the slider to add groups.</p>
+  <label class="sl" for="g">Number of groups: <span id="gv">3</span></label>
+  <input type="range" id="g" min="2" max="8" value="3">
+  <div class="stats" style="grid-template-columns:repeat(2,1fr)">
+    <div><b id="gt">3</b><span>t-tests needed (every pair)</span></div>
+    <div><b id="gf">14%</b><span>chance of at least one false alarm</span></div>
+  </div>
+  <p id="gtxt" class="fb ok"></p>
+  <div id="q3"></div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step" id="s4">
+  <h2><span class="num">4</span>The F explorer</h2>
+  <p class="lead"><strong>F = variation between groups ÷ variation within groups.</strong> Move the sliders and watch F, <em>p</em> and ω² change. It starts near the paper's result (it assumes equal gaps, spreads and group sizes).</p>
+  <p class="legend"><span style="color:var(--ind)">● Treadmill</span> <span style="color:var(--urb)">● Busy road</span> <span style="color:var(--nat)">● Nature trail</span></p>
+  <svg id="plot" viewBox="0 0 360 175" role="img" aria-label="Three bell curves showing the three groups"></svg>
+  <label class="sl" for="gap">Gap between neighbouring group means: <span id="gapv"></span></label>
+  <input type="range" id="gap" min="0" max="20" step="0.2" value="12.6">
+  <label class="sl" for="sd">Spread within each group (SD): <span id="sdv"></span></label>
+  <input type="range" id="sd" min="3" max="25" step="0.5" value="10.5">
+  <label class="sl" for="n">People per group: <span id="nv"></span></label>
+  <input type="range" id="n" min="5" max="100" step="1" value="61">
+  <div class="stats">
+    <div><b id="oF">–</b><span>F</span></div>
+    <div><b id="odf">–</b><span>df</span></div>
+    <div><b id="op">–</b><span>p</span></div>
+    <div><b id="ow">–</b><span>ω²</span></div>
+  </div>
+  <div id="verdict" class="verdict" aria-live="polite"></div>
+  <p><strong>Challenges</strong> (they tick themselves off):</p>
+  <ul class="chal">
+    <li id="c1">Keep 61 people per group, but make the result <em>not</em> significant.</li>
+    <li id="c2">Set the gap to 2. Now add people until the result becomes significant.</li>
+    <li id="c3">Find a <em>medium</em> effect: ω² between .05 and .07.</li>
+  </ul>
+</section>
+
+<!-- STEP 5 -->
+<section class="step" id="s5">
+  <h2><span class="num">5</span>Decode the result</h2>
+  <p class="lead">This is how the paper reports the restoration result. Match each piece to what it means.</p>
+  <p class="apa"><em>F</em>(2, 180) = 87.41, <em>p</em> &lt; .001, <em>η</em><sub>p</sub>² = .52</p>
+  <div class="match" id="match"></div>
+  <button class="go" id="checkMatch">Check my matches</button>
+  <p class="fb" id="matchFb" aria-live="polite"></p>
+</section>
+
+<!-- STEP 6 -->
+<section class="step" id="s6">
+  <h2><span class="num">6</span>Build the write-up</h2>
+  <p class="lead">Fill each gap from the number bank. Watch out for distractors.</p>
+  <div class="q sentence" id="sent"></div>
+  <button class="go" id="checkSent">Check my write-up</button>
+  <div class="fb" id="sentFb" aria-live="polite"></div>
+</section>
+
+<!-- STEP 7 -->
+<section class="step" id="s7">
+  <h2><span class="num">7</span>Did the walk sharpen their thinking?</h2>
+  <p class="lead">Digit span backwards: hear a string of digits, repeat it in reverse (max 14 correct).</p>
+  <div class="bars" aria-hidden="true">
+    <div style="background:var(--nat);height:61.6%">8.63</div>
+    <div style="background:var(--urb);height:64.1%">8.98</div>
+    <div style="background:var(--ind);height:57.1%">8.00</div>
+  </div>
+  <div class="barlab"><span>Nature trail</span><span>Busy road</span><span>Treadmill</span></div>
+  <p class="apa"><em>F</em>(2, 180) = 2.76, <em>p</em> = .07</p>
+  <div id="q7"></div>
+</section>
+
+<!-- STEP 8 -->
+<section class="step" id="s8">
+  <h2><span class="num">8</span>Read it critically</h2>
+  <p class="lead">Tap any card to see whether it's a real strength or limitation, and why. Then pick one of each for your own notes.</p>
+  <div id="q8"></div>
+</section>
+</main>
+
+<footer>
+  Source: Trammell, J. P., Harriger, J. A., &amp; Krumrei-Mancuso, E. J. (2024). Walking in nature may improve affect but not cognition. <em>Frontiers in Psychology, 14</em>, 1258378. Open access (CC BY 4.0).<br>
+  RMIa · Research Methods I · Leeds Beckett University. Nothing you enter on this page is collected or saved.
+</footer>
+
+<script>
+// ---------- generic MCQ ----------
+const done = new Set();
+function markStep(n){ done.add(n); document.getElementById('n'+n)?.classList.add('done'); }
+function mcq(container, items, step){
+  const root = document.getElementById(container);
+  let solved = 0;
+  items.forEach((it) => {
+    const q = document.createElement('div'); q.className = 'q';
+    const p = document.createElement('p'); p.innerHTML = it.q; q.appendChild(p);
+    const opts = document.createElement('div'); opts.className = 'opts';
+    const fb = document.createElement('div'); fb.className = 'fb'; fb.setAttribute('aria-live','polite');
+    let got = false;
+    it.o.forEach((o, i) => {
+      const b = document.createElement('button'); b.className = 'opt'; b.type = 'button'; b.innerHTML = o;
+      b.onclick = () => {
+        const right = i === it.a;
+        b.classList.add(right ? 'right' : 'wrong');
+        fb.className = 'fb ' + (right ? 'ok' : 'bad');
+        fb.innerHTML = (right ? '✓ ' : '✗ ') + ((it.f && it.f[i]) || (right ? it.why : 'Not quite. Try again.'));
+        if (right && !got){ got = true; solved++; if (solved === items.length && step) markStep(step); }
+      };
+      opts.appendChild(b);
+    });
+    q.appendChild(opts); q.appendChild(fb); root.appendChild(q);
+  });
+}
+
+// ---------- Step 1 ----------
+mcq('q1', [
+  {q:'1. What is the IV?', o:['Perceived restoration','Walking environment','Digit span'], a:1,
+   f:['That\'s what was measured: the DV.', 'Yes. The researchers decided which environment each person walked in.', 'That\'s another outcome they measured.']},
+  {q:'2. How many levels does the IV have?', o:['2','3','188'], a:1, why:'Three: nature trail, busy road, treadmill.',
+   f:['Count the walking environments again.', null, 'That\'s the number of people.']},
+  {q:'3. What is the DV, and what level of measurement?', o:['Restoration: categorical','Restoration: continuous score','Walking environment: continuous'], a:1,
+   why:'A questionnaire score, so we can compare group means.', f:['It\'s a score, not a category.', null, 'Walking environment is the IV, and it\'s categorical.']},
+  {q:'4. Between- or within-subjects?', o:['Between-subjects','Within-subjects'], a:0,
+   why:'Each person did ONE walk, so different people are in each group.', f:[null,'Within would mean every person did all three walks. They did one each.']},
+  {q:'5. Random assignment lets us say the environment…', o:['…is associated with restoration','…caused the difference in restoration'], a:1,
+   why:'Random assignment makes the groups alike in everything except the walk, so a difference can be put down to the walk.',
+   f:['That\'s what we\'d say if the groups already existed, like Year of Study. Here people were randomly assigned.', null]},
+  {q:'6. Which test?', o:['Chi-square','Independent t-test','One-way ANOVA','Paired t-test'], a:2,
+   why:'One categorical IV with 3+ groups of different people, and a continuous DV. (Kruskal-Wallis if normality fails.)',
+   f:['Chi-square needs a categorical DV.','A t-test only compares two groups.',null,'Paired tests are for the same people measured twice.']},
+], 1);
+
+// ---------- Step 2 ----------
+mcq('q2', [
+  {q:'Which is the null hypothesis (H0)?', o:['Mean restoration is the same in all three environments','The nature walk is the most restorative','At least one environment differs'], a:0,
+   why:'H0 always says "no difference": here, all three population means are equal.', f:[null,'That\'s a specific prediction, not "no difference".','That\'s H1.']},
+  {q:'Which H1 fits a one-way ANOVA?', o:['The nature walk is the most restorative','At least one environment differs in mean restoration','All three environments differ from each other'], a:1,
+   why:'The ANOVA only tells you that something differs somewhere. Post-hoc tests then tell you where.',
+   f:['Too specific: the ANOVA doesn\'t test which group is highest.', null, 'Too strong: the ANOVA would be significant even if only ONE group differed.']},
+], 2);
+
+// ---------- Step 3 ----------
+const g = document.getElementById('g');
+let s3 = false;
+function upG(){
+  const k = +g.value, t = k*(k-1)/2, fw = 1 - Math.pow(.95, t);
+  document.getElementById('gv').textContent = k;
+  document.getElementById('gt').textContent = t;
+  document.getElementById('gf').textContent = Math.round(fw*100) + '%';
+  document.getElementById('gtxt').textContent = k === 2 ? 'Two groups: one t-test, 5% risk. This is why the t-test is fine for two groups.'
+    : `${k} groups means ${t} t-tests. A one-way ANOVA asks ONE question first, so the risk stays at 5%.`;
+}
+g.oninput = upG; upG();
+mcq('q3', [{q:'So what does the ANOVA do differently?', o:['Runs every t-test at once','Asks one question first: do ANY of the groups differ?','Uses a stricter cut-off of .01'], a:1,
+  why:'One omnibus test keeps the false-alarm risk at 5%. Only if it\'s significant do we compare pairs, using post-hoc tests that adjust for the extra tests.',
+  f:['That would still mean lots of chances for a false alarm.', null, 'No, the ANOVA still uses .05.']}], 3);
+
+// ---------- Step 4: F explorer ----------
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,.1208650973866179e-2,-.5395239384953e-5];
+  let y=x, t=x+5.5; t-=(x+.5)*Math.log(t); let s=1.000000000190015; for(const ci of c) s+=ci/++y; return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap; if(Math.abs(d)<1e-30)d=1e-30; d=1/d; let h=d;
+  for(let m=1;m<=300;m++){const m2=2*m; let aa=m*(b-m)*x/((qam+m2)*(a+m2)); d=1+aa*d; if(Math.abs(d)<1e-30)d=1e-30; c=1+aa/c; if(Math.abs(c)<1e-30)c=1e-30; d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2)); d=1+aa*d; if(Math.abs(d)<1e-30)d=1e-30; c=1+aa/c; if(Math.abs(c)<1e-30)c=1e-30; d=1/d; const del=d*c; h*=del; if(Math.abs(del-1)<3e-12)break;} return h;}
+function ibeta(x,a,b){if(x<=0)return 0; if(x>=1)return 1; const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
+  return x<(a+1)/(a+b+2) ? bt*betacf(a,b,x)/a : 1-bt*betacf(b,a,1-x)/b;}
+function fP(F,d1,d2){ if(F<=0) return 1; return ibeta(d2/(d2+d1*F), d2/2, d1/2); } // upper tail
+function fmtP(p){ if(p<.001) return '< .001'; return '= ' + p.toFixed(3).replace(/^0/,''); }
+function fmtW(w){ return w<=0 ? '0' : w.toFixed(2).replace(/^0/,''); }
+
+const gap = document.getElementById('gap'), sd = document.getElementById('sd'), nn = document.getElementById('n');
+const svg = document.getElementById('plot');
+const cols = ['#8A6A3B','#46717E','#2F5D50'], labs = ['Treadmill','Busy road','Nature trail'];
+let c2armed = false;
+function draw(means, s){
+  const X0=0, X1=100, W=360, H=175, base=150, xs=v=>(v-X0)/(X1-X0)*W;
+  const peak = 1/(s*Math.sqrt(2*Math.PI)); const ymax = 1/(3*Math.sqrt(2*Math.PI));
+  const ys = v => base - v/ymax*135;
+  let out = `<line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="#55636A" stroke-width="1.5"/>`;
+  means.forEach((m,i)=>{
+    let d=''; for(let k=0;k<=200;k++){const x=X0+(X1-X0)*k/200; const y=Math.exp(-((x-m)**2)/(2*s*s))/(s*Math.sqrt(2*Math.PI)); d+=(k?'L':'M')+xs(x).toFixed(1)+' '+ys(y).toFixed(1);}
+    out += `<path d="${d} L${W} ${base} L0 ${base}Z" fill="${cols[i]}" fill-opacity=".16"/><path d="${d}" fill="none" stroke="${cols[i]}" stroke-width="3"/>`;
+    out += `<line x1="${xs(m)}" x2="${xs(m)}" y1="${base}" y2="${Math.max(ys(peak),12)}" stroke="${cols[i]}" stroke-width="2" stroke-dasharray="5 4"/>`;
+  });
+  [0,20,40,60,80,100].forEach(t=>{out+=`<text x="${Math.min(Math.max(xs(t),8),350)}" y="${base+20}" font-size="14" text-anchor="middle" fill="#1E2A2E">${t}</text>`;});
+  svg.innerHTML = out;
+}
+function upF(){
+  const d=+gap.value, s=+sd.value, n=+nn.value, N=3*n, d1=2, d2=N-3;
+  document.getElementById('gapv').textContent = d.toFixed(1);
+  document.getElementById('sdv').textContent = s.toFixed(1);
+  document.getElementById('nv').textContent = n;
+  const means=[50-d,50,50+d];
+  draw(means, s);
+  const F = n*d*d/(s*s);              // MSB = n*sum(dev^2)/2 = n*d^2 ; MSW = s^2
+  const p = fP(F,d1,d2), w = Math.max(0,(d1*(F-1))/(d1*(F-1)+N));
+  document.getElementById('oF').textContent = F < 1000 ? F.toFixed(2) : Math.round(F);
+  document.getElementById('odf').textContent = `2, ${d2}`;
+  document.getElementById('op').textContent = fmtP(p);
+  document.getElementById('ow').textContent = fmtW(w);
+  const v = document.getElementById('verdict');
+  if(p < .05){ v.className='verdict sig'; v.textContent = `p ${fmtP(p)}: below .05, reject H0. At least one group differs.`; }
+  else { v.className='verdict ns'; v.textContent = `p ${fmtP(p)}: not below .05, fail to reject H0.`; }
+  if(n===61 && p>=.05) tick('c1');
+  if(Math.abs(d-2)<.05 && p>=.05) c2armed = true;
+  if(c2armed && Math.abs(d-2)<.05 && p<.05) tick('c2');
+  if(w>=.05 && w<=.07) tick('c3');
+}
+function tick(id){ const el=document.getElementById(id); el.classList.add('met');
+  if(['c1','c2','c3'].every(c=>document.getElementById(c).classList.contains('met'))) markStep(4); }
+[gap,sd,nn].forEach(e=>e.oninput=upF); upF();
+
+// ---------- Step 5: decode ----------
+const toks = [['2','D'],['180','B'],['87.41','A'],['p < .001','C'],['.52','E']];
+const meanings = {A:'Variation between groups ÷ variation within',B:'Total N minus number of groups',C:'How likely an F this big would be if H0 were true',D:'Number of groups minus 1',E:'Proportion of variation explained by the groups'};
+const matchEl = document.getElementById('match');
+toks.forEach(([t],i)=>{
+  const tk=document.createElement('div'); tk.className='tok'; tk.textContent=t;
+  const sel=document.createElement('select'); sel.id='m'+i; sel.setAttribute('aria-label','Meaning of '+t);
+  sel.innerHTML='<option value="">Choose…</option>'+Object.entries(meanings).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+  matchEl.appendChild(tk); matchEl.appendChild(sel);
+});
+document.getElementById('checkMatch').onclick=()=>{
+  let ok=0; toks.forEach(([t,a],i)=>{const s=document.getElementById('m'+i); const r=s.value===a; s.className=s.value?(r?'right':'wrong'):''; if(r)ok++;});
+  const fb=document.getElementById('matchFb');
+  if(ok===5){fb.className='fb ok'; fb.innerHTML='✓ All five. Note: the paper reports partial eta squared (.52). In RMIa we report omega squared, which corrects a slight overestimate: here ω² ≈ .49.'; markStep(5);}
+  else {fb.className='fb bad'; fb.textContent=`${ok} of 5 right. Hint: the first df is about the groups, the second about the people.`;}
+};
+
+// ---------- Step 6: write-up ----------
+const bank = ['180','61.61','.52','2','< .001','183','34.36','87.41'];
+const answers = ['2','180','87.41','< .001','61.61','34.36'];
+const tips = {
+  0:{ '180':'df1 is groups − 1.', '183':'That\'s N. df1 is groups − 1.' },
+  1:{ '183':'Close! df2 is N minus the number of groups: 183 − 3.', '2':'That\'s df1. df2 is about the people.' },
+  2:{ '.52':'That\'s the effect size. F goes after the brackets.' },
+  3:{ '.52':'That\'s the effect size, not p.' },
+  4:{ '34.36':'That\'s the treadmill mean. The nature trail was highest.' },
+  5:{ '61.61':'That\'s the nature trail mean. The treadmill was lowest.' }
+};
+const sentEl=document.getElementById('sent');
+const sel=i=>`<select id="w${i}" aria-label="Gap ${i+1}"><option value="">${i+1}</option>${bank.map(b=>`<option>${b}</option>`).join('')}</select>`;
+sentEl.innerHTML = `Perceived restoration differed across walking environments, <em>F</em>(${sel(0)}, ${sel(1)}) = ${sel(2)}, <em>p</em> ${sel(3)}. Bonferroni post-hoc tests showed the nature trail (<em>M</em> = ${sel(4)}, <em>SD</em> = 8.26) was rated more restorative than the busy road (<em>M</em> = 50.55, <em>SD</em> = 11.00), which was rated more restorative than the treadmill (<em>M</em> = ${sel(5)}, <em>SD</em> = 12.24), all <em>p</em>s &lt; .001.`;
+document.getElementById('checkSent').onclick=()=>{
+  let ok=0, msgs=[];
+  answers.forEach((a,i)=>{const s=document.getElementById('w'+i); const r=s.value===a; s.className=s.value?(r?'right':'wrong'):''; if(r)ok++; else if(s.value && tips[i][s.value]) msgs.push(`Gap ${i+1}: ${tips[i][s.value]}`);});
+  const fb=document.getElementById('sentFb');
+  if(ok===6){fb.className='fb ok'; fb.innerHTML='✓ Spot on. In your own portfolio you\'d report <strong>Welch\'s <em>F</em></strong> with Games-Howell post-hocs and add ω², e.g. Welch\'s <em>F</em>(df1, df2) = X.XX, <em>p</em> &lt; .001, ω² = .XX. (No zero before <em>p</em>; two decimals for Welch\'s df2.)'; markStep(6);}
+  else {fb.className='fb bad'; fb.innerHTML=`${ok} of 6 right.` + (msgs.length?'<br>'+msgs.join('<br>'):'');}
+};
+
+// ---------- Step 7 ----------
+mcq('q7', [
+  {q:'Reject or fail to reject H0?', o:['Reject H0','Fail to reject H0'], a:1, why:'p = .07 is above .05. Report it as it is: not "nearly significant" or "a trend".', f:['p needs to be below .05 to reject H0.', null]},
+  {q:'Should we run post-hoc tests?', o:['Yes, to see which pairs differ','No'], a:1, why:'The omnibus F wasn\'t significant, so there\'s nothing to follow up.', f:['Only follow up a significant F.', null]},
+  {q:'Can we conclude the nature walk has NO effect on thinking?', o:['Yes, p > .05 proves it','No'], a:1,
+   why:'No evidence of a difference isn\'t evidence of no difference. The authors suggest their students already live surrounded by nature, so one more walk might not add much. That\'s the kind of reasoning Component D asks for.',
+   f:['A non-significant result never proves H0.', null]},
+], 7);
+
+// ---------- Step 8 ----------
+mcq('q8', [
+  {q:'Participants were randomly assigned to a walk.', o:['Strength','Limitation'], a:0, why:'It lets us say the environment caused the difference.', f:[null,'It\'s a strength: it rules out pre-existing differences between groups.']},
+  {q:'There were TWO comparison groups (busy road and treadmill).', o:['Strength','Limitation'], a:0, why:'It separates "being outdoors" from "being in nature": the busy road was outdoors but not natural.', f:[null,'It\'s a strength: with only a treadmill group you couldn\'t tell nature apart from simply being outside.']},
+  {q:'Restoration was only measured after the walk.', o:['Strength','Limitation'], a:1, why:'With no "before" score, we can\'t see how much each walk changed things.', f:['Without a baseline we can\'t measure change. That\'s a limitation.', null]},
+  {q:'Participants knew which walk they were doing.', o:['Strength','Limitation'], a:1, why:'Expectations ("nature is relaxing") could shape their ratings: demand characteristics.', f:['People\'s expectations could colour a self-report rating. That\'s a limitation.', null]},
+  {q:'All participants came from one university, surrounded by mountains and sea.', o:['Strength','Limitation'], a:1, why:'Results may not generalise to students with less access to nature.', f:['A narrow sample limits who the results apply to.', null]},
+], 8);
+</script>
+</body>
+</html>
