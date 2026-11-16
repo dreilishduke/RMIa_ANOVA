@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone on the Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one calm reading column; five numbered steps, each a worked task with instant feedback. Lecture-companion, phone-first. */
+:root {
+  --bg: #F4F7F5; --surface: #FFFFFF; --pale: #EAF1ED; --mint: #CFE3DA; --line: #D3DFD9;
+  --ink: #1E2A2E; --muted: #4F5E64; --slate: #3E6A77; --sage: #2F5D50;
+  --good: #23704A; --good-bg: #E3F2E9; --bad: #A63D2B; --bad-bg: #F8E6E1;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --step-1: 1.0625rem; --step-2: 1.25rem; --step-3: 1.6rem; --step-4: 2.2rem;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131B1D; --surface: #1B2528; --pale: #1F2D2E; --mint: #28433D; --line: #2F3F42;
+  --ink: #E5EEEA; --muted: #A7B7B2; --slate: #8CBBC8; --sage: #82C5AA;
+  --good: #73D19B; --good-bg: #1B3326; --bad: #F2917C; --bad-bg: #3A2320; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #131B1D; --surface: #1B2528; --pale: #1F2D2E; --mint: #28433D; --line: #2F3F42;
+  --ink: #E5EEEA; --muted: #A7B7B2; --slate: #8CBBC8; --sage: #82C5AA;
+  --good: #73D19B; --good-bg: #1B3326; --bad: #F2917C; --bad-bg: #3A2320; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: var(--step-1); line-height: 1.55; }
+.wrap { max-width: 46rem; margin: 0 auto; padding-block: 1.5rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 2.25rem; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: var(--step-4); }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-2); }
+p { margin: 0; }
+.eyebrow { font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); font-weight: 700; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+a { color: var(--slate); }
+:focus-visible { outline: 3px solid var(--slate); outline-offset: 2px; border-radius: 6px; }
+
+/* Hero */
+.hero { display: grid; gap: 1rem; }
+.cite { font-size: .95rem; color: var(--muted); }
+.scene { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.desk { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: .9rem; display: grid; gap: .4rem; justify-items: center; text-align: center; }
+.desk svg { width: 100%; max-width: 200px; height: auto; }
+.desk b { font-size: 1.05rem; }
+.desk .n { font-size: .95rem; color: var(--muted); }
+.flow { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; font-size: .98rem; }
+.flow span { background: var(--pale); border-radius: 999px; padding: .3rem .8rem; }
+.flow i { font-style: normal; color: var(--muted); }
+
+/* Steps */
+.step { display: grid; gap: 1rem; }
+.step-head { display: flex; gap: .85rem; align-items: baseline; }
+.step-no { font-family: var(--font-num); font-weight: 600; color: var(--surface); background: var(--sage); border-radius: 999px; min-width: 2rem; height: 2rem; display: inline-grid; place-items: center; font-size: 1rem; flex: none; transform: translateY(-2px); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1.1rem; display: grid; gap: 1rem; }
+
+/* Questions */
+.q { display: grid; gap: .55rem; }
+.q + .q { border-top: 1px solid var(--line); padding-top: 1rem; }
+.q-text { font-weight: 700; }
+.opts { display: flex; flex-wrap: wrap; gap: .5rem; }
+.opt { font: inherit; font-size: 1rem; color: var(--ink); background: var(--pale); border: 2px solid transparent; border-radius: 10px; padding: .5rem .85rem; cursor: pointer; text-align: left; }
+.opt:hover { border-color: var(--line); }
+.opt[aria-pressed="true"].right { background: var(--good-bg); border-color: var(--good); }
+.opt[aria-pressed="true"].wrong { background: var(--bad-bg); border-color: var(--bad); }
+.fb { font-size: .98rem; padding: .55rem .8rem; border-radius: 10px; }
+.fb.right { background: var(--good-bg); }
+.fb.wrong { background: var(--bad-bg); }
+.fb strong { margin-right: .25rem; }
+.score { font-size: .95rem; color: var(--muted); }
+
+/* Charts */
+.chart { width: 100%; height: auto; display: block; }
+.chart text { fill: var(--ink); font-family: var(--font-body); }
+.chart .axis { stroke: var(--muted); }
+.chart .tick { fill: var(--muted); font-size: 13px; }
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .95rem; }
+.key { display: inline-flex; align-items: center; gap: .4rem; }
+.sw { width: .9rem; height: .9rem; border-radius: 3px; display: inline-block; }
+.note { font-size: .9rem; color: var(--muted); border-left: 3px solid var(--mint); padding-left: .7rem; }
+
+/* Decode */
+.result-big { font-family: var(--font-num); font-size: clamp(1.3rem, 5vw, 2rem); line-height: 1.6; }
+.result-big em { font-family: var(--font-body); font-style: italic; }
+.tok { border-bottom: 3px solid var(--slate); padding: 0 .1rem; }
+.decode { display: grid; gap: .7rem; }
+.decode-row { display: grid; grid-template-columns: 5.5rem 1fr; gap: .6rem; align-items: center; }
+.decode-row .label { font-family: var(--font-num); font-weight: 600; font-size: 1.15rem; }
+select, input[type="text"] { font: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 8px; padding: .4rem .5rem; min-width: 0; width: 100%; }
+select.right, input.right { border-color: var(--good); background: var(--good-bg); }
+select.wrong, input.wrong { border-color: var(--bad); background: var(--bad-bg); }
+
+/* Simulator */
+.sim-grid { display: grid; gap: .9rem; }
+.slider { display: grid; grid-template-columns: 1fr auto; gap: .2rem .8rem; align-items: center; }
+.slider label { font-weight: 700; }
+.slider output { font-family: var(--font-num); font-weight: 600; }
+.slider input { grid-column: 1 / -1; width: 100%; accent-color: var(--sage); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+.stat { background: var(--pale); border-radius: 12px; padding: .55rem .6rem; text-align: center; }
+.stat .v { font-family: var(--font-num); font-weight: 600; font-size: 1.35rem; display: block; }
+.stat .k { font-size: .85rem; color: var(--muted); }
+.verdict { font-weight: 700; padding: .55rem .8rem; border-radius: 10px; }
+.verdict.sig { background: var(--good-bg); color: var(--good); }
+.verdict.ns { background: var(--bad-bg); color: var(--bad); }
+.btns { display: flex; flex-wrap: wrap; gap: .5rem; }
+.btn { font: inherit; font-size: .98rem; font-weight: 700; color: var(--surface); background: var(--sage); border: 0; border-radius: 10px; padding: .55rem 1rem; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--sage); border: 2px solid var(--sage); }
+.challenges { display: grid; gap: .5rem; margin: 0; padding-left: 1.2rem; }
+
+/* APA builder */
+.apa { line-height: 2.4; font-size: 1.08rem; }
+.apa input { width: 5.2rem; display: inline-block; padding: .15rem .35rem; text-align: center; font-family: var(--font-num); }
+.apa em { font-style: italic; }
+.model { background: var(--pale); border-radius: 12px; padding: .9rem 1rem; line-height: 1.8; }
+.hl-desc { background: color-mix(in srgb, var(--slate) 22%, transparent); border-radius: 4px; padding: 0 .15rem; }
+.hl-test { background: color-mix(in srgb, var(--sage) 24%, transparent); border-radius: 4px; padding: 0 .15rem; }
+.hl-es { background: color-mix(in srgb, var(--good) 22%, transparent); border-radius: 4px; padding: 0 .15rem; }
+.fb-list { display: grid; gap: .35rem; margin: 0; padding-left: 1.1rem; font-size: .98rem; }
+
+/* Critical reader */
+.flips { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .6rem; }
+.flip { font: inherit; text-align: left; color: var(--ink); background: var(--pale); border: 2px solid transparent; border-radius: 12px; padding: .8rem .9rem; cursor: pointer; display: grid; gap: .35rem; }
+.flip .tag { font-size: .8rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700; }
+.flip .tag.plus { color: var(--good); }
+.flip .tag.minus { color: var(--bad); }
+.flip .more { color: var(--muted); font-size: .95rem; }
+.coins { display: flex; flex-wrap: wrap; gap: .4rem; min-height: 2.6rem; }
+.coin { width: 2.4rem; height: 2.4rem; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-num); font-weight: 600; font-size: 1rem; border: 2px solid var(--sage); }
+.coin.h { background: var(--sage); color: var(--surface); }
+.coin.t { background: var(--surface); color: var(--sage); }
+footer { font-size: .9rem; color: var(--muted); display: grid; gap: .4rem; }
+@media (max-width: 30rem) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .decode-row { grid-template-columns: 4.2rem 1fr; } }
+@media (prefers-reduced-motion: no-preference) { .fb, .model { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(4px); opacity: .6; } to { transform: none; opacity: 1; } } }
+</style>
+<style>html{color-scheme:light} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">RMIa · Lecture 6 · Published study</p>
+  <h1>Does a phone on the desk hurt your memory?</h1>
+  <p>119 students did the same memory task. Half had their own phone on the desk in front of them. Half had it out of sight. Work through the study one step at a time.</p>
+  <div class="scene" aria-hidden="true">
+    <div class="desk">
+      <svg viewBox="0 0 200 120"><rect x="10" y="70" width="180" height="10" rx="3" fill="var(--slate)"/><rect x="30" y="80" width="8" height="35" fill="var(--slate)"/><rect x="162" y="80" width="8" height="35" fill="var(--slate)"/><rect x="40" y="46" width="62" height="22" rx="3" fill="var(--mint)"/><line x1="48" y1="54" x2="92" y2="54" stroke="var(--muted)" stroke-width="2"/><line x1="48" y1="61" x2="84" y2="61" stroke="var(--muted)" stroke-width="2"/><rect x="134" y="16" width="34" height="50" rx="5" fill="var(--muted)" opacity=".25"/><path d="M128 10 L176 70" stroke="var(--bad)" stroke-width="4"/></svg>
+      <b>Phone out of sight</b><span class="n num">n = 58</span>
+    </div>
+    <div class="desk">
+      <svg viewBox="0 0 200 120"><rect x="10" y="70" width="180" height="10" rx="3" fill="var(--slate)"/><rect x="30" y="80" width="8" height="35" fill="var(--slate)"/><rect x="162" y="80" width="8" height="35" fill="var(--slate)"/><rect x="40" y="46" width="62" height="22" rx="3" fill="var(--mint)"/><line x1="48" y1="54" x2="92" y2="54" stroke="var(--muted)" stroke-width="2"/><line x1="48" y1="61" x2="84" y2="61" stroke="var(--muted)" stroke-width="2"/><rect x="128" y="40" width="44" height="28" rx="5" fill="var(--sage)"/><rect x="132" y="44" width="36" height="20" rx="2" fill="var(--mint)"/><circle cx="150" cy="35" r="4" fill="var(--sage)"/></svg>
+      <b>Phone on the desk</b><span class="n num">n = 61</span>
+    </div>
+  </div>
+  <div class="flow"><span>119 undergraduates</span><i>→</i><span>randomly assigned</span><i>→</i><span>Operation Span memory task</span><i>→</i><span>recall score out of 25</span></div>
+  <p class="cite">Tanil, C. T., &amp; Yong, M. H. (2020). Mobile phones: The effect of its presence on learning and memory. <em>PLOS ONE, 15</em>(8), e0219233. <a href="https://doi.org/10.1371/journal.pone.0219233">doi.org/10.1371/journal.pone.0219233</a></p>
+</header>
+
+<section class="step" aria-labelledby="s1">
+  <div class="step-head"><span class="step-no">1</span><h2 id="s1">Work out the design</h2></div>
+  <div class="panel" id="design"></div>
+</section>
+
+<section class="step" aria-labelledby="s2">
+  <div class="step-head"><span class="step-no">2</span><h2 id="s2">Research question and hypotheses</h2></div>
+  <div class="panel" id="hyp"></div>
+</section>
+
+<section class="step" aria-labelledby="s3">
+  <div class="step-head"><span class="step-no">3</span><h2 id="s3">How big can chance gaps be?</h2></div>
+  <div class="panel">
+    <p>Flip 10 coins. Then compare with the person next to you. The coin is the same for everyone, so any difference between you is pure chance.</p>
+    <div class="btns"><button class="btn" id="flip" type="button">Flip 10 coins</button><button class="btn ghost" id="flip-reset" type="button">Clear</button></div>
+    <div class="coins" id="coins" aria-live="polite"></div>
+    <p id="flip-msg" class="muted">No flips yet.</p>
+    <p class="note">This is sampling variability. H0 says the phone study’s gap of 1.13 is just this kind of wobble.</p>
+  </div>
+</section>
+
+<section class="step" aria-labelledby="s4">
+  <div class="step-head"><span class="step-no">4</span><h2 id="s4">What did they find?</h2></div>
+  <div class="panel">
+    <div class="legend"><span class="key"><span class="sw" style="background:var(--slate)"></span>Phone out of sight · <span class="num">M = 14.21, SD = 2.61</span></span><span class="key"><span class="sw" style="background:var(--sage)"></span>Phone on the desk · <span class="num">M = 13.08, SD = 2.53</span></span></div>
+    <svg class="chart" id="overlap" viewBox="0 0 640 260" role="img" aria-label="Two overlapping bell curves for recall score. The phone-out-of-sight curve is centred at 14.21 and the phone-on-desk curve at 13.08. They overlap heavily."></svg>
+    <p class="note">Curves drawn from the reported means and SDs. Illustrative only: these are not the real participants’ scores.</p>
+    <h3>Decode the result</h3>
+    <div class="result-big" aria-label="t of 117 equals 2.38, p equals .019, d equals 0.44"><em>t</em>(<span class="tok">117</span>) = <span class="tok">2.38</span>, <em>p</em> = <span class="tok">.019</span>, <em>d</em> = <span class="tok">0.44</span></div>
+    <p class="muted">Match each number to what it tells you.</p>
+    <div class="decode" id="decode"></div>
+    <div id="decode-fb"></div>
+    <p class="note">The paper reports <span class="num">p = .02</span>. Three decimals (<span class="num">.019</span>) are calculated from their reported <em>t</em> and df, as SPSS would print it.</p>
+  </div>
+</section>
+
+<section class="step" aria-labelledby="s5">
+  <div class="step-head"><span class="step-no">5</span><h2 id="s5">If H0 were true: build the pile</h2></div>
+  <div class="panel">
+    <p>Imagine phones make <strong>no</strong> difference. Rerun the study with 119 new students, randomly split 58 and 61, and work out <em>t</em> each time. Every rerun drops one <em>t</em> onto the pile.</p>
+    <div class="btns">
+      <button class="btn" id="run1" type="button">Run 1</button>
+      <button class="btn" id="run10" type="button">Run 10</button>
+      <button class="btn" id="run100" type="button">Run 100</button>
+      <button class="btn" id="run1000" type="button">Run 1,000</button>
+      <button class="btn ghost" id="pile-reset" type="button">Reset</button>
+    </div>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><span class="v" id="p-runs">0</span><span class="k">reruns</span></div>
+      <div class="stat"><span class="v" id="p-last">–</span><span class="k">last <em>t</em></span></div>
+      <div class="stat"><span class="v" id="p-out">0</span><span class="k">beyond ±2.38</span></div>
+      <div class="stat"><span class="v" id="p-pct">–</span><span class="k">% beyond</span></div>
+    </div>
+    <svg class="chart" id="pile" viewBox="0 0 640 260" role="img" aria-label="A histogram of t values from simulated reruns with no real effect, with lines at plus and minus 2.38."></svg>
+    <p id="pile-msg" class="note">Press a button to start. Try Run 1 a few times first, then Run 1,000.</p>
+  </div>
+</section>
+
+<section class="step" aria-labelledby="s6">
+  <div class="step-head"><span class="step-no">6</span><h2 id="s6">Signal and noise: play with the study</h2></div>
+  <div class="panel">
+    <p>The sliders start at Tanil and Yong’s numbers. Change them and watch <em>t</em>, <em>p</em> and <em>d</em> respond.</p>
+    <div class="sim-grid">
+      <div class="slider"><label for="gap">Gap between means (signal)</label><output id="gap-o" for="gap" class="num"></output><input type="range" id="gap" min="0" max="4" step="0.01" value="1.13"></div>
+      <div class="slider"><label for="sd">Spread within groups, SD (noise)</label><output id="sd-o" for="sd" class="num"></output><input type="range" id="sd" min="0.5" max="6" step="0.01" value="2.57"></div>
+      <div class="slider"><label for="n">People per group</label><output id="n-o" for="n" class="num"></output><input type="range" id="n" min="5" max="300" step="1" value="60"></div>
+    </div>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><span class="v" id="o-t"></span><span class="k"><em>t</em></span></div>
+      <div class="stat"><span class="v" id="o-df"></span><span class="k">df</span></div>
+      <div class="stat"><span class="v" id="o-p"></span><span class="k"><em>p</em> (2-tailed)</span></div>
+      <div class="stat"><span class="v" id="o-d"></span><span class="k">Cohen’s <em>d</em></span></div>
+    </div>
+    <div class="verdict" id="verdict" aria-live="polite"></div>
+    <p class="note">The explorer uses 60 per group and one shared SD, so it starts at t = 2.41 with df = 118. The paper had 58 and 61 people (df = 117) and reports t = 2.38. The small difference is rounding.</p>
+    <svg class="chart" id="tdist" viewBox="0 0 640 230" role="img" aria-label="The t distribution if H0 were true, with the two-tailed 5 percent cut-offs shaded and a line marking the current t value."></svg>
+    <div class="btns"><button class="btn ghost" id="reset" type="button">Reset to the real study</button></div>
+    <h3>Challenges</h3>
+    <ol class="challenges">
+      <li>Keep the real gap and SD. What is the smallest group size that still gives <em>p</em> &lt; .05?</li>
+      <li>Set 300 per group. How small can the gap get and still be “significant”? Is that gap worth caring about? Check <em>d</em>.</li>
+      <li>Double the SD. What happens to <em>t</em>? Why would a less reliable memory test do this?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="step" aria-labelledby="s7">
+  <div class="step-head"><span class="step-no">7</span><h2 id="s7">Build the APA write-up</h2></div>
+  <div class="panel">
+    <p>Fill in the blanks using the numbers in step 4. Two decimal places, and use APA rules for <em>p</em>.</p>
+    <p class="apa" id="apa">Participants whose phone was out of sight recalled more items (<em>M</em> = <input type="text" id="a1" inputmode="decimal" aria-label="Mean, phone out of sight">, <em>SD</em> = <input type="text" id="a2" inputmode="decimal" aria-label="SD, phone out of sight">) than those whose phone was on the desk (<em>M</em> = <input type="text" id="a3" inputmode="decimal" aria-label="Mean, phone on desk">, <em>SD</em> = <input type="text" id="a4" inputmode="decimal" aria-label="SD, phone on desk">), <em>t</em>(<input type="text" id="a5" inputmode="numeric" aria-label="Degrees of freedom">) = <input type="text" id="a6" inputmode="decimal" aria-label="t value">, <em>p</em> = <input type="text" id="a7" inputmode="decimal" aria-label="p value">, <em>d</em> = <input type="text" id="a8" inputmode="decimal" aria-label="Cohen's d">.</p>
+    <div class="btns"><button class="btn" id="check" type="button">Check my write-up</button><button class="btn ghost" id="show" type="button">Show the model answer</button></div>
+    <div id="apa-fb"></div>
+    <div class="model" id="model" hidden>
+      <p><span class="hl-desc">Participants whose phone was out of sight recalled more items (<em>M</em> = 14.21, <em>SD</em> = 2.61) than those whose phone was on the desk (<em>M</em> = 13.08, <em>SD</em> = 2.53)</span>, <span class="hl-test"><em>t</em>(117) = 2.38, <em>p</em> = .019</span>, <span class="hl-es"><em>d</em> = 0.44</span>. Because participants were randomly assigned, this suggests that having a phone in view reduced working-memory recall.</p>
+      <div class="legend" style="margin-top:.6rem"><span class="key"><span class="sw hl-desc"></span>Direction + descriptives</span><span class="key"><span class="sw hl-test"></span>The test</span><span class="key"><span class="sw hl-es"></span>Effect size</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="step" aria-labelledby="s8">
+  <div class="step-head"><span class="step-no">8</span><h2 id="s8">Read it critically</h2></div>
+  <div class="panel">
+    <p>Tap each card. Which strength and which limitation would you mention in a reflection?</p>
+    <div class="flips" id="flips"></div>
+  </div>
+</section>
+
+<footer>
+  <p>Companion to RMIa Lecture 6 (Week 7): comparing two groups. Your answers stay on your device and are not collected.</p>
+</footer>
+</div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  // ---------- MCQ blocks ----------
+  function mcq(container, items) {
+    const scoreEl = document.createElement("p"); scoreEl.className = "score";
+    const done = {};
+    items.forEach((it, qi) => {
+      const q = document.createElement("div"); q.className = "q";
+      q.innerHTML = `<p class="q-text" id="${it.id}-q">${it.q}</p>`;
+      const opts = document.createElement("div"); opts.className = "opts"; opts.setAttribute("role", "group"); opts.setAttribute("aria-labelledby", it.id + "-q");
+      const fb = document.createElement("div"); fb.setAttribute("aria-live", "polite");
+      it.options.forEach((o, oi) => {
+        const b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.id = `${it.id}-${oi}`;
+        b.innerHTML = o.t; b.setAttribute("aria-pressed", "false");
+        b.addEventListener("click", () => {
+          opts.querySelectorAll(".opt").forEach((x) => { x.setAttribute("aria-pressed", "false"); x.classList.remove("right", "wrong"); });
+          b.setAttribute("aria-pressed", "true"); b.classList.add(o.ok ? "right" : "wrong");
+          fb.className = "fb " + (o.ok ? "right" : "wrong");
+          fb.innerHTML = `<strong>${o.ok ? "Yes." : "Not quite."}</strong>${o.fb}`;
+          done[qi] = o.ok; update();
+        });
+        opts.appendChild(b);
+      });
+      q.appendChild(opts); q.appendChild(fb); container.appendChild(q);
+    });
+    function update() { const n = Object.values(done).filter(Boolean).length; scoreEl.textContent = `${n} of ${items.length} correct`; }
+    update(); container.appendChild(scoreEl);
+  }
+
+  mcq($("design"), [
+    { id: "iv", q: "What is the independent variable (IV)?", options: [
+      { t: "Recall accuracy", ok: false, fb: "That’s what was measured, so it’s the DV." },
+      { t: "Where the phone was", ok: true, fb: "The researchers manipulated phone location: out of sight or on the desk." },
+      { t: "Smartphone addiction score", ok: false, fb: "They did measure this, but it wasn’t what they manipulated." } ] },
+    { id: "lv", q: "How many levels (groups) does the IV have?", options: [
+      { t: "1", ok: false, fb: "You need at least two groups to compare." },
+      { t: "2", ok: true, fb: "Out of sight vs on the desk." },
+      { t: "3", ok: false, fb: "Count the conditions: out of sight and on the desk." } ] },
+    { id: "dv", q: "What is the DV, and what level of measurement is it?", options: [
+      { t: "Recall accuracy, scale (0–25)", ok: true, fb: "A score you can average, so we can compare means." },
+      { t: "Recall accuracy, nominal", ok: false, fb: "Scores out of 25 are numbers with equal steps, not category labels." },
+      { t: "Phone location, nominal", ok: false, fb: "Phone location is nominal, but it’s the IV." } ] },
+    { id: "bw", q: "Between-subjects or within-subjects?", options: [
+      { t: "Between-subjects", ok: true, fb: "Each student was in only one condition, so the two groups are different people." },
+      { t: "Within-subjects", ok: false, fb: "That would need every student to do the task twice, once in each condition (Week 9)." } ] },
+    { id: "ra", q: "Students were randomly assigned. What does that let us say?", options: [
+      { t: "Phone location caused any difference", ok: true, fb: "Random assignment balances other differences between groups, so a causal claim is reasonable. Compare the StudentWellbeing example, where groups already existed." },
+      { t: "Phone location is associated with memory, nothing more", ok: false, fb: "That’s the limit for pre-existing groups. Random assignment lets us go further." },
+      { t: "The results apply to everyone", ok: false, fb: "Random assignment helps with cause. Who the results generalise to depends on the sample (Lecture 4)." } ] },
+    { id: "test", q: "Use the Design→Test Map. Which test?", options: [
+      { t: "Chi-square", ok: false, fb: "Chi-square needs a categorical DV. Recall accuracy is scale." },
+      { t: "Independent t-test", ok: true, fb: "Two groups of different people, scale DV. If normality failed in either group: Mann-Whitney U." },
+      { t: "One-way ANOVA", ok: false, fb: "ANOVA is for three or more groups (next week)." },
+      { t: "Paired t-test", ok: false, fb: "Paired is for the same people measured twice." } ] },
+  ]);
+
+  mcq($("hyp"), [
+    { id: "rq", q: "Which is the best research question?", options: [
+      { t: "Are phones bad?", ok: false, fb: "Too vague: bad for what, measured how?" },
+      { t: "Does having a phone on the desk affect working-memory recall?", ok: true, fb: "Names the IV and the DV, and can be answered with this design." },
+      { t: "Do students with phones on their desks have a mean of 13.08?", ok: false, fb: "That describes the sample. RQs ask about a difference or relationship." } ] },
+    { id: "h0", q: "Which is H0, the null hypothesis?", options: [
+      { t: "There is no difference in recall accuracy between students whose phone is on the desk and those whose phone is out of sight.", ok: true, fb: "H0 always says there is no difference in the population." },
+      { t: "Phones on the desk reduce recall.", ok: false, fb: "That’s a (directional) alternative hypothesis." },
+      { t: "The two sample means will be exactly equal.", ok: false, fb: "Hypotheses are about populations. Sample means are almost never exactly equal." } ] },
+    { id: "h1", q: "Which H1 matches a two-tailed test?", options: [
+      { t: "There is a difference in recall accuracy between students whose phone is on the desk and those whose phone is out of sight.", ok: true, fb: "Non-directional: it doesn’t say which group is higher, so both tails count." },
+      { t: "Students with the phone on the desk will recall less.", ok: false, fb: "This predicts a direction, which matches a one-tailed test. In RMIa we report two-tailed." },
+      { t: "Phones prove memory gets worse.", ok: false, fb: "We never prove H1. We reject or fail to reject H0." } ] },
+  ]);
+
+  // ---------- Overlap chart ----------
+  const pdf = (x, m, s) => Math.exp(-0.5 * ((x - m) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
+  function overlap() {
+    const svg = $("overlap"), W = Math.max(300, Math.round(svg.parentElement.clientWidth - 36)), H = 250, L = 16, R = 16, T = 28, B = 50;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const narrow = W < 500, x0 = narrow ? 7 : 5, x1 = narrow ? 21 : 23, sx = (x) => L + (x - x0) / (x1 - x0) * (W - L - R);
+    const ymax = 0.17, sy = (y) => H - B - y / ymax * (H - T - B);
+    const groups = [{ m: 14.21, s: 2.61, c: css("--slate"), lab: "14.21" }, { m: 13.08, s: 2.53, c: css("--sage"), lab: "13.08" }];
+    let g = `<line class="axis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke-width="1.5"/>`;
+    for (let v = narrow ? 8 : 6; v <= (narrow ? 20 : 22); v += narrow ? 4 : 2) g += `<line class="axis" x1="${sx(v)}" y1="${H - B}" x2="${sx(v)}" y2="${H - B + 6}"/><text class="tick" x="${sx(v)}" y="${H - B + 22}" text-anchor="middle">${v}</text>`;
+    g += `<text x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle" font-size="14">Recall score (out of 25)</text>`;
+    groups.forEach((gr) => {
+      let d = "";
+      for (let x = x0; x <= x1; x += 0.1) d += `${d ? "L" : "M"}${sx(x).toFixed(1)},${sy(pdf(x, gr.m, gr.s)).toFixed(1)}`;
+      g += `<path d="${d}L${sx(x1)},${sy(0)}L${sx(x0)},${sy(0)}Z" fill="${gr.c}" fill-opacity=".22"/><path d="${d}" fill="none" stroke="${gr.c}" stroke-width="3"/>`;
+      g += `<line x1="${sx(gr.m)}" y1="${sy(0)}" x2="${sx(gr.m)}" y2="${sy(pdf(gr.m, gr.m, gr.s))}" stroke="${gr.c}" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+    });
+    const top = sy(pdf(14.21, 14.21, 2.61)) - 14;
+    g += `<line x1="${sx(13.08)}" y1="${top}" x2="${sx(14.21)}" y2="${top}" stroke="${css("--ink")}" stroke-width="2"/><text x="${sx(13.645)}" y="${top - 8}" text-anchor="middle" font-size="14" font-weight="700">gap = 1.13</text>`;
+    svg.innerHTML = g;
+  }
+
+  // ---------- Decode ----------
+  const meanings = ["Choose…", "Degrees of freedom: total N − 2", "Signal ÷ noise: the gap in units of chance variation", "How likely a t this big would be if H0 were true", "How many SDs apart the group means are"];
+  const decodeItems = [["117", 1], ["2.38", 2], [".019", 3], ["0.44", 4]];
+  const dc = $("decode"), dfb = $("decode-fb");
+  decodeItems.forEach(([lab, ans], i) => {
+    const row = document.createElement("div"); row.className = "decode-row";
+    row.innerHTML = `<span class="label">${lab}</span>`;
+    const sel = document.createElement("select"); sel.id = "dec" + i; sel.setAttribute("aria-label", "Meaning of " + lab);
+    meanings.forEach((m, mi) => { const o = document.createElement("option"); o.value = mi; o.textContent = m; sel.appendChild(o); });
+    sel.addEventListener("change", () => {
+      sel.classList.remove("right", "wrong");
+      if (+sel.value) sel.classList.add(+sel.value === ans ? "right" : "wrong");
+      const allRight = decodeItems.every(([, a], j) => +$("dec" + j).value === a);
+      dfb.className = allRight ? "fb right" : ""; dfb.innerHTML = allRight ? "<strong>All matched.</strong>119 students − 2 = 117. The gap of 1.13 is 2.38 times its standard error (0.47). A t that big happens about 1.9% of the time if H0 is true, so p &lt; .05 and we reject H0. The groups are 0.44 SDs apart: between small and medium." : "";
+    });
+    row.appendChild(sel); dc.appendChild(row);
+  });
+
+  // ---------- t distribution maths ----------
+  function lgamma(z) { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5]; let x = z, y = z, tmp = x + 5.5; tmp -= (x + 0.5) * Math.log(tmp); let ser = 1.000000000190015; for (let j = 0; j < 6; j++) ser += c[j] / ++y; return -tmp + Math.log(2.5066282746310005 * ser / x); }
+  function betacf(a, b, x) { const MAX = 200, EPS = 3e-14, FP = 1e-300; let qab = a + b, qap = a + 1, qam = a - 1, c = 1, d = 1 - qab * x / qap; if (Math.abs(d) < FP) d = FP; d = 1 / d; let h = d; for (let m = 1; m <= MAX; m++) { const m2 = 2 * m; let aa = m * (b - m) * x / ((qam + m2) * (a + m2)); d = 1 + aa * d; if (Math.abs(d) < FP) d = FP; c = 1 + aa / c; if (Math.abs(c) < FP) c = FP; d = 1 / d; h *= d * c; aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2)); d = 1 + aa * d; if (Math.abs(d) < FP) d = FP; c = 1 + aa / c; if (Math.abs(c) < FP) c = FP; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < EPS) break; } return h; }
+  function ibeta(x, a, b) { if (x <= 0) return 0; if (x >= 1) return 1; const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x)); return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b; }
+  const pTwo = (t, df) => ibeta(df / (df + t * t), df / 2, 0.5);
+  function tcrit(df) { let lo = 0, hi = 20; for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (pTwo(m, df) > 0.05) lo = m; else hi = m; } return (lo + hi) / 2; }
+  const tpdf = (x, df) => Math.exp(lgamma((df + 1) / 2) - lgamma(df / 2)) / Math.sqrt(df * Math.PI) * Math.pow(1 + x * x / df, -(df + 1) / 2);
+  const fmtP = (p) => p < .001 ? "< .001" : p.toFixed(3).replace(/^0/, "");
+
+  // ---------- Simulator ----------
+  function sim() {
+    const gap = +$("gap").value, sd = +$("sd").value, n = +$("n").value, df = 2 * n - 2;
+    const se = sd * Math.sqrt(2 / n), t = gap / se, p = pTwo(t, df), d = gap / sd;
+    $("gap-o").textContent = gap.toFixed(2); $("sd-o").textContent = sd.toFixed(2); $("n-o").textContent = n;
+    $("o-t").textContent = t.toFixed(2); $("o-df").textContent = df; $("o-p").textContent = fmtP(p); $("o-d").textContent = d.toFixed(2);
+    const v = $("verdict"), sig = p < .05;
+    v.className = "verdict " + (sig ? "sig" : "ns");
+    v.textContent = sig ? `p ${fmtP(p).startsWith("<") ? "" : "= "}${fmtP(p)}: below .05, reject H0` : `p = ${fmtP(p)}: not below .05, fail to reject H0`;
+    drawT(t, df);
+  }
+  function drawT(t, df) {
+    const svg = $("tdist"), W = Math.max(300, Math.round(svg.parentElement.clientWidth - 36)), H = 230, L = 12, R = 12, T = 30, B = 44, x0 = -5, x1 = 9;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const sx = (x) => L + (x - x0) / (x1 - x0) * (W - L - R), ymax = 0.42, sy = (y) => H - B - y / ymax * (H - T - B);
+    const c = tcrit(df), ink = css("--ink"), sage = css("--sage"), slate = css("--slate"), mint = css("--mint");
+    let path = "", g = "";
+    for (let x = x0; x <= x1; x += 0.05) path += `${path ? "L" : "M"}${sx(x).toFixed(1)},${sy(tpdf(x, df)).toFixed(1)}`;
+    g += `<path d="${path}L${sx(x1)},${sy(0)}L${sx(x0)},${sy(0)}Z" fill="${mint}" fill-opacity=".7"/>`;
+    [[x0, -c], [c, x1]].forEach(([a, b]) => { let tp = ""; for (let x = a; x <= b; x += 0.05) tp += `${tp ? "L" : "M"}${sx(x).toFixed(1)},${sy(tpdf(x, df)).toFixed(1)}`; g += `<path d="${tp}L${sx(b)},${sy(0)}L${sx(a)},${sy(0)}Z" fill="${sage}"/>`; });
+    g += `<path d="${path}" fill="none" stroke="${ink}" stroke-width="2.5"/><line class="axis" x1="${L}" y1="${sy(0)}" x2="${W - R}" y2="${sy(0)}" stroke-width="1.5"/>`;
+    [[-c, "−" + c.toFixed(2)], [0, "0"], [c, "+" + c.toFixed(2)]].forEach(([x, lab]) => g += `<text class="tick" x="${sx(x)}" y="${sy(0) + 20}" text-anchor="middle">${lab}</text>`);
+    g += `<text x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle" font-size="14">t if H0 were true (df = ${df}). Dark tails = the 5% cut-off.</text>`;
+    const tx = Math.min(t, x1 - 0.2), lab = t > x1 - 0.2 ? `t = ${t.toFixed(2)} →` : `t = ${t.toFixed(2)}`;
+    g += `<line x1="${sx(tx)}" y1="${T - 6}" x2="${sx(tx)}" y2="${sy(0)}" stroke="${slate}" stroke-width="4"/><text x="${sx(tx) + (tx > 6 ? -8 : 8)}" y="${T + 8}" text-anchor="${tx > 6 ? "end" : "start"}" font-size="16" font-weight="700" fill="${slate}">${lab}</text>`;
+    svg.innerHTML = g;
+  }
+  ["gap", "sd", "n"].forEach((id) => $(id).addEventListener("input", sim));
+  $("reset").addEventListener("click", () => { $("gap").value = 1.13; $("sd").value = 2.57; $("n").value = 60; sim(); });
+
+  // ---------- APA builder ----------
+  const ans = [
+    { id: "a1", v: "14.21", lab: "First mean" }, { id: "a2", v: "2.61", lab: "First SD" }, { id: "a3", v: "13.08", lab: "Second mean" }, { id: "a4", v: "2.53", lab: "Second SD" },
+    { id: "a5", v: "117", lab: "df" }, { id: "a6", v: "2.38", lab: "t" }, { id: "a7", v: ".019", lab: "p" }, { id: "a8", v: "0.44", lab: "d" } ];
+  $("check").addEventListener("click", () => {
+    const notes = [];
+    ans.forEach((a) => {
+      const el = $(a.id), raw = el.value.trim(); el.classList.remove("right", "wrong");
+      if (!raw) { notes.push(`${a.lab}: still blank.`); el.classList.add("wrong"); return; }
+      let ok = raw === a.v;
+      if (a.id === "a7") {
+        if (raw === "0.019" || raw === "0.02") notes.push("p: APA drops the zero before the decimal point, because p can never be above 1.");
+        else if (raw === ".02") { notes.push("p: the paper says .02, but give three decimals when you have them: .019."); }
+        else if (!ok) notes.push("p: check step 4. Three decimals, no leading zero.");
+      } else if (a.id === "a8" && raw === ".44") notes.push("d: keep the zero (0.44). Unlike p, d can be bigger than 1.");
+      else if (a.id === "a5" && raw === "119") notes.push("df: that’s N. For an independent t-test, df = N − 2.");
+      else if (a.id === "a6" && raw.startsWith("-")) notes.push("t: the sign only reflects which group was entered first. Report it positive here, with the direction stated in words.");
+      else if (!ok && /^\d+\.\d$/.test(raw)) notes.push(`${a.lab}: use two decimal places.`);
+      else if (!ok) notes.push(`${a.lab}: not quite. Look back at the numbers above.`);
+      el.classList.add(ok ? "right" : "wrong");
+    });
+    const fb = $("apa-fb");
+    if (!notes.length) { fb.className = "fb right"; fb.innerHTML = "<strong>Spot on.</strong>That’s a complete APA result: direction, descriptives, test and effect size."; $("model").hidden = false; }
+    else { fb.className = "fb wrong"; fb.innerHTML = `<strong>Nearly there.</strong><ul class="fb-list">${notes.map((n) => `<li>${n}</li>`).join("")}</ul>`; }
+  });
+  $("show").addEventListener("click", () => { $("model").hidden = false; });
+
+  // ---------- Critical reader ----------
+  const flips = [
+    ["plus", "Random assignment", "Groups differ only by chance at the start, so a causal claim is defensible."],
+    ["plus", "One clear outcome", "A single DV analysed with one test: no fishing through lots of measures."],
+    ["plus", "Normality checked", "They report using Shapiro-Wilk and histograms, the two checks from Lecture 4 and today."],
+    ["minus", "Levene’s not reported", "We can’t tell which row of the output they used. The SDs are similar, so it probably didn’t matter here."],
+    ["minus", "Effect size mislabelled", "Printed with an η² symbol, but the value (.44) is Cohen’s d. Small reporting errors make results harder to trust."],
+    ["minus", "Power of only .66", "With about 60 per group, a real effect this size would be missed about one time in three (Lecture 4: ~64 per group for d = 0.5)."],
+    ["minus", "Who does it generalise to?", "Students at one private university in an Asian capital. Lecture 4’s WEIRD question works both ways."],
+  ];
+  const fl = $("flips");
+  flips.forEach(([kind, head, more], i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "flip"; b.id = "flip" + i; b.setAttribute("aria-expanded", "false");
+    b.innerHTML = `<span class="tag ${kind}">${kind === "plus" ? "Strength" : "Limitation"}</span><b>${head}</b><span class="more" hidden>${more}</span>`;
+    b.addEventListener("click", () => { const m = b.querySelector(".more"); m.hidden = !m.hidden; b.setAttribute("aria-expanded", String(!m.hidden)); });
+    fl.appendChild(b);
+  });
+
+  // ---------- Coins ----------
+  const coinFlips = [];
+  $("flip").addEventListener("click", () => {
+    const res = Array.from({ length: 10 }, () => Math.random() < 0.5);
+    const heads = res.filter(Boolean).length; coinFlips.push(heads);
+    $("coins").innerHTML = res.map((h) => `<span class="coin ${h ? "h" : "t"}" aria-label="${h ? "heads" : "tails"}">${h ? "H" : "T"}</span>`).join("");
+    const mean = coinFlips.reduce((a, b) => a + b, 0) / coinFlips.length;
+    $("flip-msg").innerHTML = `<strong>${heads} heads.</strong> Your flips so far: ${coinFlips.join(", ")} (average ${mean.toFixed(1)}). Did your neighbour get the same?`;
+  });
+  $("flip-reset").addEventListener("click", () => { coinFlips.length = 0; $("coins").innerHTML = ""; $("flip-msg").textContent = "No flips yet."; });
+
+  // ---------- Build the pile ----------
+  const PN1 = 58, PN2 = 61, PSD = 2.57, PDF = PN1 + PN2 - 2, TOBS = 2.38, EDGES = [];
+  for (let e = -4.75; e <= 4.751; e += 0.25) EDGES.push(+e.toFixed(2));
+  const counts = new Array(EDGES.length - 1).fill(0);
+  let runs = 0, out = 0, lastT = null, spare = null;
+  function randn() { if (spare !== null) { const v = spare; spare = null; return v; } let u = 0, v = 0; while (u === 0) u = Math.random(); v = Math.random(); const r = Math.sqrt(-2 * Math.log(u)); spare = r * Math.sin(2 * Math.PI * v); return r * Math.cos(2 * Math.PI * v); }
+  function oneT() {
+    let s1 = 0, q1 = 0, s2 = 0, q2 = 0;
+    for (let i = 0; i < PN1; i++) { const x = randn() * PSD; s1 += x; q1 += x * x; }
+    for (let i = 0; i < PN2; i++) { const x = randn() * PSD; s2 += x; q2 += x * x; }
+    const m1 = s1 / PN1, m2 = s2 / PN2, v1 = (q1 - PN1 * m1 * m1) / (PN1 - 1), v2 = (q2 - PN2 * m2 * m2) / (PN2 - 1);
+    const sp2 = ((PN1 - 1) * v1 + (PN2 - 1) * v2) / PDF;
+    return (m1 - m2) / Math.sqrt(sp2 * (1 / PN1 + 1 / PN2));
+  }
+  function addRuns(k) {
+    for (let i = 0; i < k; i++) {
+      const t = oneT(); lastT = t; runs++; if (Math.abs(t) >= TOBS) out++;
+      const b = Math.floor((Math.max(-4.749, Math.min(4.749, t)) + 4.75) / 0.25); counts[b]++;
+    }
+    drawPile();
+  }
+  function drawPile() {
+    $("p-runs").textContent = runs.toLocaleString("en-GB");
+    $("p-last").textContent = lastT === null ? "–" : lastT.toFixed(2);
+    $("p-out").textContent = out;
+    $("p-pct").textContent = runs ? (100 * out / runs).toFixed(1) : "–";
+    const svg = $("pile"), W = Math.max(300, Math.round(svg.parentElement.clientWidth - 36)), H = 260, L = 12, R = 12, T = 34, B = 44;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const sx = (x) => L + (x + 4.75) / 9.5 * (W - L - R);
+    const maxC = Math.max(4, ...counts), curveMax = runs >= 50 ? tpdf(0, PDF) * runs * 0.25 : 0, ymax = Math.max(maxC, curveMax) * 1.1;
+    const sy = (y) => H - B - y / ymax * (H - T - B);
+    const sage = css("--sage"), mint = css("--mint"), slate = css("--slate"), ink = css("--ink");
+    let g = "";
+    counts.forEach((c, i) => {
+      if (!c) return;
+      const x0 = sx(EDGES[i]) + 1, x1 = sx(EDGES[i + 1]) - 1, mid = (EDGES[i] + EDGES[i + 1]) / 2;
+      g += `<rect x="${x0.toFixed(1)}" y="${sy(c).toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(sy(0) - sy(c)).toFixed(1)}" fill="${Math.abs(mid) >= TOBS - 0.1 ? sage : mint}"/>`;
+    });
+    if (runs >= 50) { let p = ""; for (let x = -4.75; x <= 4.75; x += 0.05) p += `${p ? "L" : "M"}${sx(x).toFixed(1)},${sy(tpdf(x, PDF) * runs * 0.25).toFixed(1)}`; g += `<path d="${p}" fill="none" stroke="${ink}" stroke-width="2.5"/>`; }
+    g += `<line class="axis" x1="${L}" y1="${sy(0)}" x2="${W - R}" y2="${sy(0)}" stroke-width="1.5"/>`;
+    [-4, -2, 0, 2, 4].forEach((v) => g += `<text class="tick" x="${sx(v)}" y="${sy(0) + 20}" text-anchor="middle">${v}</text>`);
+    [-TOBS, TOBS].forEach((v) => g += `<line x1="${sx(v)}" y1="${T - 8}" x2="${sx(v)}" y2="${sy(0)}" stroke="${slate}" stroke-width="3"/>`);
+    g += `<text x="${sx(TOBS) + 6}" y="${T + 4}" font-size="14" font-weight="700" fill="${slate}">our t = 2.38</text>`;
+    g += `<text x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle" font-size="14">t from each rerun (no real effect)</text>`;
+    svg.innerHTML = g;
+    const msg = $("pile-msg");
+    if (!runs) msg.textContent = "Press a button to start. Try Run 1 a few times first, then Run 1,000.";
+    else if (runs < 50) msg.textContent = "Each rerun has no real effect, yet t is rarely exactly 0. That’s chance at work.";
+    else msg.innerHTML = `${out} of ${runs.toLocaleString("en-GB")} reruns (${(100 * out / runs).toFixed(1)}%) gave a t at least as extreme as 2.38. The theory says 1.9%: that’s <em>p</em> = .019. The curve is the t distribution.`;
+  }
+  ["run1", "run10", "run100", "run1000"].forEach((id) => $(id).addEventListener("click", () => addRuns(+id.slice(3))));
+  $("pile-reset").addEventListener("click", () => { counts.fill(0); runs = 0; out = 0; lastT = null; drawPile(); });
+
+  function drawAll() { overlap(); sim(); drawPile(); }
+  drawAll();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll);
+  let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawAll, 150); });
+  new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>
+
+</body>
+</html>
